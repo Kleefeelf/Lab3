@@ -1,18 +1,20 @@
 package ua.lviv.iot.bar;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import ua.lviv.iot.bar.manager.*;
-import ua.lviv.iot.bar.models.*;
+import ua.lviv.iot.bar.manager.CounterBarManager;
+import ua.lviv.iot.bar.models.Country;
+import ua.lviv.iot.bar.models.Chair;
+import ua.lviv.iot.bar.models.Item;
+import ua.lviv.iot.bar.models.Glass;
+import ua.lviv.iot.bar.models.Plate;
+
 
 public class App {
     public static void main(String[] args) {
-        System.out.println("Hello World!");
-
         Chair krislo = Chair.builder()
                 .comfort("Zruchno")
-                .countryManufacturer(Country.BHUTAN)
+                .country(Country.BHUTAN)
                 .form("Hrest")
                 .itemType("Krislo")
                 .height(2)
@@ -22,7 +24,7 @@ public class App {
                 .material("Derevo")
                 .build();
         Glass chashka = Glass.builder()
-                .countryManufacturer(Country.CHINA)
+                .country(Country.CHINA)
                 .itemType("Stakan")
                 .material("Glass")
                 .price(25)
@@ -35,7 +37,7 @@ public class App {
         Plate plate = Plate.builder()
                 .depth(2)
                 .brand("Nefrit Plates")
-                .countryManufacturer(Country.USA)
+                .country(Country.USA)
                 .itemType("Tarikla")
                 .design("Print")
                 .material("Nefrit")
