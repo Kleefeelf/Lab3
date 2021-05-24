@@ -1,42 +1,45 @@
 package ua.lviv.iot.bar.services;
 
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.lviv.iot.bar.models.Glass;
+import ua.lviv.iot.bar.repositories.GlassRepository;
 
 import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
+import java.util.NoSuchElementException;
 
 @Data
 @Service
 public class GlassService {
 
-    private Map<Integer, Glass> glassMap = new HashMap<Integer, Glass>();
-    private AtomicInteger id = new AtomicInteger(0);
+    @Autowired
+    private GlassRepository glassRepository;
+
 
     public List<Glass> getAllGlasses() {
-        return glassMap.values().stream().collect(Collectors.toList());
+       return glassRepository.findAll();
     }
 
-    public Glass getGlass(int id) {
-        return glassMap.get(id);
+    public Glass getGlass(Integer id) {
+        return glassRepository.findById(id).orElseThrow();
     }
 
     public Glass addGlass(Glass glass) {
-        int glassId = id.incrementAndGet();
-        glass.setId(glassId);
-        glassMap.put(glassId, glass);
+        return glassRepository.save(glass);
+    }
+
+    public Glass changeGlass(Integer id, Glass glass){
+        if (glassRepository.existsById(id)) {
+            glass.setId(id);
+            return glassRepository.save(glass);
+        }
+        throw new NoSuchElementException();
+    }
+
+    public Glass deleteGlass(Integer id) {
+        Glass glass = glassRepository.findById(id).orElseThrow();
+        glassRepository.deleteById(id);
         return glass;
-    }
-
-    public Glass changeGlass(int id, Glass glass){
-        return glassMap.put(id, glass);
-    }
-
-    public void deleteGlass(int id) {
-        glassMap.remove(id);
     }
 }
