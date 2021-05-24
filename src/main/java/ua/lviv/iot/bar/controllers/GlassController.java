@@ -1,14 +1,14 @@
 package ua.lviv.iot.bar.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import ua.lviv.iot.bar.models.Glass;
 import ua.lviv.iot.bar.services.GlassService;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/bar")
@@ -23,28 +23,43 @@ public class GlassController {
     }
 
     @GetMapping("/glasses/{id}")
-    public Glass getGlass(@PathVariable int id) {
-        return glassService.getGlass(id);
+    public ResponseEntity getGlass(@PathVariable final Integer id) {
+        try {
+            Glass glass = glassService.getGlass(id);
+            return ResponseEntity.ok(glass);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(404).build();
+        }
     }
 
     @PostMapping("/glasses")
-    public void addGlass(@RequestBody Glass glass) {
-        glassService.addGlass(glass);
+    public ResponseEntity<Glass> addGlass(@RequestBody Glass glass) {
+        if (glass.getId() == null) {
+            return new ResponseEntity<Glass>(glassService.addGlass(glass), HttpStatus.OK);
+        }
+        return new ResponseEntity<Glass>(HttpStatus.BAD_REQUEST);
     }
 
-    @PutMapping("/glasses/{id}")
-    public ResponseEntity<Glass> changeGlass(@RequestBody Glass glass, @PathVariable int id) {
-        Glass tmpGlass = glassService.getGlassMap().get(id);
-        if (tmpGlass != null){
-            glass.setId(id);
-            glassService.changeGlass(id, glass);
-            return ResponseEntity.ok(glass);
+    @PutMapping("/glasses")
+    public ResponseEntity<Glass> changeGlass(@RequestBody Glass glass) {
+        if(glass.getId() == null) {
+            return new ResponseEntity<Glass>(HttpStatus.BAD_REQUEST);
         }
-        return  ResponseEntity.notFound().build();
+        try {
+
+            return new ResponseEntity<Glass>(glassService.changeGlass(glass.getId(), glass), HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @DeleteMapping("/glasses/{id}")
-    public void deleteGlass(@PathVariable int id) {
-        glassService.deleteGlass(id);
+    public ResponseEntity deleteGlass(@PathVariable final int id) {
+       try {
+           Glass glass = glassService.getGlass(id);
+           return ResponseEntity.ok(glassService.deleteGlass(id));
+       } catch (NoSuchElementException e) {
+           return ResponseEntity.status(404).build();
+       }
     }
 }
